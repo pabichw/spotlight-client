@@ -7,6 +7,16 @@ import { supabase } from '../utils/supabaseClient'
 import Pagination from '@mui/material/Pagination';
 import ImageGallery from 'react-image-gallery';
 import "react-image-gallery/styles/css/image-gallery.css";
+import Container from '@mui/material/Container';
+import Grid from '@mui/material/Grid';
+import Typography from '@mui/material/Typography';
+import Card from '@mui/joy/Card';
+import CardCover from '@mui/joy/CardCover';
+import CardContent from '@mui/joy/CardContent';
+import JoyTypography from '@mui/joy/Typography';
+import Box from '@mui/material/Box';
+import { format, parseISO } from 'date-fns'
+import { Chip } from '@mui/material'
 
 const PER_PAGE = 6;
 
@@ -14,7 +24,15 @@ const fetchPhotos = async (page) => {
   const firstIndex = PER_PAGE * (page - 1)
   return await supabase
     .from('spotlight_photos')
-    .select('*', { count: 'exact' })
+    .select(`
+        name,
+        url,
+        created_at,
+        tags (
+          value
+        )
+      `, { count: 'exact' }
+    )
     .order('created_at', { ascending: false })
     .range(firstIndex, firstIndex + PER_PAGE - 1)
 }
@@ -47,46 +65,72 @@ export default function Home({ photos }) {
   }
   
   return (
-    <div className={styles.container}>
+    <Container>
       <Head>
         <title>Spotlight Wallpapers</title>
-        <meta name="description" content="Spotlight wallpapers from Windows 11" />
-        <meta name="tags" content="spotlight wallpapers, windows 11, lockscreen wallpapers windows 11" />
       </Head>
-      <h2>Spotlight Wallpapers</h2>
-      <h4>Lock screen wallpapers from Windows 11 updated daily</h4>
-      <article className={styles.photoGrid}>
-        { photos?.map(photo => 
-          <div key={photo.id} className={styles.photoCard} onClick={() => toggleGallery(photo)}>
-            <Image 
-              src={photo.url} 
-              alt={photo.name} 
-              width={400} 
-              height={300} 
-              objectFit="cover"
-              layout='responsive'
-            />
-          </div>
-        ) }
-      </article>
-      {pagination.pages && <div className={styles.paginationWrapper}>
-        <Pagination count={pagination.pages} page={pagination.page} onChange={handlePageChange}/>
-      </div>}
-      <footer className={styles.footer}>
-        <p>
-          Above images are Windows 11 Spotlight (lock screen) pictures found on the internet. Updates happen on a daily basis.
-          I do NOT own any rights to theese images. Project was made strictly for educational, non-commercial purpose.
-        </p>
-      </footer>
-      {galleryVisible && 
-        <div className={styles.galleryLayer}>
-          <span className={styles.galleryCloseBtn} onClick={toggleGallery}>X</span>
-          <ImageGallery 
-            items={photos.map(photo => ({ original: photo.url, thumbnail: photo.url }))}
-            startIndex={activePhotoIndex}
-          /> 
-        </div>
-      }
-    </div>
+      <Box mt={4}>
+        <Box mb={2}>
+          <Typography variant="h5">
+            Spotlight Wallpapers
+          </Typography>
+          <Typography variant="subtitle2">
+            Lock screen wallpapers from Windows 11 updated daily
+          </Typography>
+        </Box>
+          <Grid container className={styles.photoGrid} spacing={2}>
+            { photos?.map(photo => 
+              <Grid item key={photo.id}>
+                <Card sx={{ minHeight: '280px', minWidth: 320 }} className={styles.photoCard} onClick={toggleGallery}>
+                  <CardCover>
+                    <Image
+                      src={photo.url}
+                      alt={photo.name}
+                      width={400} 
+                      height={300} 
+                      objectFit="cover"
+                      layout='responsive'
+                    />
+                  </CardCover>
+                  <CardCover
+                    sx={{
+                      background:
+                        'linear-gradient(to top, rgba(0,0,0,0.4), rgba(0,0,0,0) 200px), linear-gradient(to top, rgba(0,0,0,0.8), rgba(0,0,0,0) 300px)',
+                    }}
+                  />
+                  <CardContent sx={{ justifyContent: 'flex-end' }}>
+                    <JoyTypography level="h2" fontSize="lg" textColor="#fff" mb={1}>
+                      {photo.name}
+                    </JoyTypography>
+                    <JoyTypography
+                      textColor="neutral.300"
+                    >
+                      {format(parseISO(photo.created_at), 'dd/MM/yyyy')}
+                    </JoyTypography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ) }
+          </Grid>
+          {pagination.pages && <div className={styles.paginationWrapper}>
+            <Pagination count={pagination.pages} page={pagination.page} onChange={handlePageChange}/>
+          </div>}
+          <footer className={styles.footer}>
+            <Typography variant="body1">
+              Above images are Windows 11 Spotlight (lock screen) pictures found on the internet. Updates happen on a daily basis.
+              I do NOT own any rights to theese images. Project was made strictly for educational, non-commercial purpose.
+            </Typography>
+          </footer>
+          {galleryVisible && 
+            <div className={styles.galleryLayer}>
+              <span className={styles.galleryCloseBtn} onClick={toggleGallery}>X</span>
+              <ImageGallery 
+                items={photos.map(photo => ({ original: photo.url, thumbnail: photo.url }))}
+                startIndex={activePhotoIndex}
+              /> 
+            </div>
+          }
+        </Box>
+    </Container>
   )
 }
