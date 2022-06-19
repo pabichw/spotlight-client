@@ -27,6 +27,7 @@ export default function Home({ photos }) {
   const router = useRouter()
   const [pagination, setPagination] = useState({ page: router.query.page || 1, pages: null });
   const [galleryVisible, setGalleryVisible] = useState(false);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
 
   useEffect(() => {
     fetchPhotos(pagination.page).then(data => {
@@ -39,8 +40,9 @@ export default function Home({ photos }) {
     router.push({ query: { page }})
   }
 
-  const toggleGallery = () => {
+  const toggleGallery = (photo) => {
     setGalleryVisible(!galleryVisible)
+    setActivePhotoIndex(photos.findIndex(ph => ph.id === photo.id))
   }
   
   return (
@@ -54,7 +56,7 @@ export default function Home({ photos }) {
       <h4>Lock screen wallpapers from Windows 11 updated daily</h4>
       <article className={styles.photoGrid}>
         { photos?.map(photo => 
-          <div key={photo.id} className={styles.photoCard} onClick={toggleGallery}>
+          <div key={photo.id} className={styles.photoCard} onClick={() => toggleGallery(photo)}>
             <Image 
               src={photo.url} 
               alt={photo.name} 
@@ -76,9 +78,12 @@ export default function Home({ photos }) {
         </p>
       </footer>
       {galleryVisible && 
-        <div className={styles.galleryLayer}>
+        <div className={styles.galleryLayer} onClick={toggleGallery}>
           <span className={styles.galleryCloseBtn} onClick={toggleGallery}>X</span>
-          <ImageGallery items={photos.map(photo => ({ original: photo.url, thumbnail: photo.url }))} /> 
+          <ImageGallery 
+            items={photos.map(photo => ({ original: photo.url, thumbnail: photo.url }))}
+            startIndex={activePhotoIndex}
+          /> 
         </div>
       }
     </div>
