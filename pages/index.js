@@ -15,6 +15,7 @@ const fetchPhotos = async (page) => {
   return await supabase
     .from('spotlight_photos')
     .select('*', { count: 'exact' })
+    .order('created_at', { ascending: false })
     .range(firstIndex, firstIndex + PER_PAGE - 1)
 }
 
@@ -78,7 +79,7 @@ export default function Home({ photos }) {
         </p>
       </footer>
       {galleryVisible && 
-        <div className={styles.galleryLayer} onClick={toggleGallery}>
+        <div className={styles.galleryLayer}>
           <span className={styles.galleryCloseBtn} onClick={toggleGallery}>X</span>
           <ImageGallery 
             items={photos.map(photo => ({ original: photo.url, thumbnail: photo.url }))}
