@@ -19,13 +19,13 @@ const fetchPhotos = async (page) => {
 }
 
 export async function getServerSideProps({query}) {
-  const data = await fetchPhotos(query.page);
+  const data = await fetchPhotos(query.page || 1);
   return { props: { photos: data.data } }
 }
 
 export default function Home({ photos }) {
   const router = useRouter()
-  const [pagination, setPagination] = useState({ page: router.query.page || 1, pages: 100 });
+  const [pagination, setPagination] = useState({ page: router.query.page || 1, pages: null });
   const [galleryVisible, setGalleryVisible] = useState(false);
 
   useEffect(() => {
@@ -66,9 +66,9 @@ export default function Home({ photos }) {
           </div>
         ) }
       </article>
-      <div className={styles.paginationWrapper}>
+      {pagination.pages && <div className={styles.paginationWrapper}>
         <Pagination count={pagination.pages} page={pagination.page} onChange={handlePageChange}/>
-      </div>
+      </div>}
       <footer className={styles.footer}>
         <p>
           Above images are Windows 11 Spotlight (lock screen) pictures found on the internet. Updates happen on a daily basis.
