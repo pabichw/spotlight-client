@@ -5,32 +5,42 @@ import { useEffect, useState } from 'react'
 import styles from '../styles/Home.module.css'
 import { supabase } from '../utils/supabaseClient'
 import Pagination from '@mui/material/Pagination';
+import ImageGallery from 'react-image-gallery';
+import "react-image-gallery/styles/css/image-gallery.css";
 
 const PER_PAGE = 6;
 
-export default function Home() {
+const fetchPhotos = async (page) => {
+  const firstIndex = PER_PAGE * (page - 1)
+  return await supabase
+    .from('spotlight_photos')
+    .select('*', { count: 'exact' })
+    .range(firstIndex, firstIndex + PER_PAGE - 1)
+}
+
+export async function getServerSideProps({query}) {
+  const data = await fetchPhotos(query.page);
+  return { props: { photos: data.data } }
+}
+
+export default function Home({ photos }) {
   const router = useRouter()
-  const [photos, setPhotos] = useState([])
   const [pagination, setPagination] = useState({ page: router.query.page || 1, pages: 100 });
+  const [galleryVisible, setGalleryVisible] = useState(false);
 
   useEffect(() => {
-    fetchPhotos(pagination.page)
+    fetchPhotos(pagination.page).then(data => {
+      setPagination(state => ({ ...state, pages: Math.ceil(data.count / PER_PAGE) }))
+    })
   }, [pagination.page])
-
-  const fetchPhotos = async (page) => {
-    const firstIndex = PER_PAGE * (page - 1)
-    const data = await supabase
-      .from('spotlight_photos')
-      .select('*', { count: 'exact' })
-      .range(firstIndex, firstIndex + PER_PAGE - 1)
-
-    setPhotos(data.data);
-    setPagination(state => ({ ...state, pages: Math.ceil(data.count / PER_PAGE) }))
-  }
 
   const handlePageChange = (_, page) => {
     setPagination({ ...pagination, page })
     router.push({ query: { page }})
+  }
+
+  const toggleGallery = () => {
+    setGalleryVisible(!galleryVisible)
   }
   
   return (
@@ -44,7 +54,7 @@ export default function Home() {
       <h4>Lock screen wallpapers from Windows 11 updated daily</h4>
       <article className={styles.photoGrid}>
         { photos?.map(photo => 
-          <div key={photo.id} className={styles.photoCard}>
+          <div key={photo.id} className={styles.photoCard} onClick={toggleGallery}>
             <Image 
               src={photo.url} 
               alt={photo.name} 
@@ -65,6 +75,12 @@ export default function Home() {
           I do NOT own any rights to theese images. Project was made strictly for educational, non-commercial purpose.
         </p>
       </footer>
+      {galleryVisible && 
+        <div className={styles.galleryLayer}>
+          <span className={styles.galleryCloseBtn} onClick={toggleGallery}>X</span>
+          <ImageGallery items={photos.map(photo => ({ original: photo.url, thumbnail: photo.url }))} /> 
+        </div>
+      }
     </div>
   )
 }

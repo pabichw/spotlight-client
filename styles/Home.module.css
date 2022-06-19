@@ -14,6 +14,31 @@
   overflow: hidden;
 }
 
+.galleryLayer {
+  height: 100vh;
+  width: 100vw;
+  background-color: rgba(0,0,0,0.9);
+  position: fixed;
+  padding-top: 50px;
+  top:0;
+  left:0;
+  z-index: 100;
+}
+
+.galleryCloseBtn {
+  color: white;
+  font-size: 30px;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 101;
+  cursor: pointer;
+}
+
+.image-gallery-slides {
+  min-height: 87vh;
+}
+
 .paginationWrapper {
   margin-top: 2rem;
 }
@@ -21,8 +46,15 @@
 .footer {
   margin-top: 2rem;
 }
+
 .footer p {
   font-size: 0.85rem;
   opacity: 0.44;
   line-height: 1.3rem;
+}
+
+@media only screen and (max-width: 720px) {
+  .photoGrid {
+    grid-template-columns: repeat(1, 1fr);
+  } 
 }
