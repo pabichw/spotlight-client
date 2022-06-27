@@ -16,7 +16,6 @@ import CardContent from '@mui/joy/CardContent';
 import JoyTypography from '@mui/joy/Typography';
 import Box from '@mui/material/Box';
 import { format, parseISO } from 'date-fns'
-import { Chip } from '@mui/material'
 
 const PER_PAGE = 6;
 
@@ -25,6 +24,7 @@ const fetchPhotos = async (page) => {
   return await supabase
     .from('spotlight_photos')
     .select(`
+        id,
         name,
         url,
         created_at,
@@ -81,7 +81,7 @@ export default function Home({ photos }) {
           <Grid container className={styles.photoGrid} spacing={2}>
             { photos?.map(photo => 
               <Grid item key={photo.id}>
-                <Card sx={{ minHeight: '280px', minWidth: 320 }} className={styles.photoCard} onClick={toggleGallery}>
+                <Card sx={{ minHeight: '280px', minWidth: 320 }} className={styles.photoCard} onClick={() => toggleGallery(photo)}>
                   <CardCover>
                     <Image
                       src={photo.url}
