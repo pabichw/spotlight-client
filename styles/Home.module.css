@@ -2,9 +2,9 @@
   padding: 0 2rem;
 }
 
-
 .photoCard { 
   cursor: pointer;
+  overflow: hidden;
 }
 
 .JoyCardCover-root > span {
