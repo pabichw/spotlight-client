@@ -16,29 +16,36 @@ import CardContent from '@mui/joy/CardContent';
 import JoyTypography from '@mui/joy/Typography';
 import Box from '@mui/material/Box';
 import { format, parseISO } from 'date-fns'
+import SearchBar from '../components/SearchBar'
 
 const PER_PAGE = 6;
 
-const fetchPhotos = async (page) => {
+const fetchPhotos = async (page, search) => {
   const firstIndex = PER_PAGE * (page - 1)
-  return await supabase
-    .from('spotlight_photos')
-    .select(`
-        id,
-        name,
-        url,
-        created_at,
-        tags (
-          value
-        )
-      `, { count: 'exact' }
-    )
-    .order('created_at', { ascending: false })
-    .range(firstIndex, firstIndex + PER_PAGE - 1)
+  let request = supabase
+  .from('spotlight_photos')
+  .select(`
+      id,
+      name,
+      url,
+      created_at,
+      tags (
+        value
+      )
+    `, { count: 'exact' }
+  )
+  .order('created_at', { ascending: false })
+  .range(firstIndex, firstIndex + PER_PAGE - 1)
+
+  if (search) {
+    request = request.textSearch('name', search);
+  }  
+
+  return await request;
 }
 
 export async function getServerSideProps({query}) {
-  const data = await fetchPhotos(query.page || 1);
+  const data = await fetchPhotos(query.page || 1, query.search);
   return { props: { photos: data.data } }
 }
 
@@ -71,15 +78,20 @@ export default function Home({ photos }) {
       </Head>
       <Box mt={4}>
         <Box mb={2}>
-          <Typography variant="h5">
-            Spotlight Wallpapers
-          </Typography>
-          <Typography variant="subtitle2">
-            Lock screen wallpapers from Windows 11 updated daily
-          </Typography>
+          <Box>
+            <Typography variant="h5">
+              Spotlight Wallpapers
+            </Typography>
+            <Typography variant="subtitle2">
+              Lock screen wallpapers from Windows 11 updated daily
+            </Typography>
+          </Box>
+          <Box mt={2}>
+            <SearchBar />
+          </Box>
         </Box>
           <Grid container className={styles.photoGrid} spacing={2}>
-            { photos?.map(photo => 
+            { photos?.map((photo, idx) => 
               <Grid item key={photo.id} xs={12} sm={6} md={4} >
                 <Card sx={{ minHeight: '280px' }} className={styles.photoCard} onClick={() => toggleGallery(photo)}>
                   <CardCover>
@@ -90,6 +102,7 @@ export default function Home({ photos }) {
                       height={300} 
                       objectFit="cover"
                       layout='responsive'
+                      loading={idx < 2 ? 'eager' : 'lazy'}
                     />
                   </CardCover>
                   <CardCover
