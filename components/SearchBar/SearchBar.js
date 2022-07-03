@@ -82,7 +82,6 @@ export default function SearchBar() {
                 <StyledInputBase
                 placeholder="Search…"
                 inputProps={{ 'aria-label': 'search' }}
-                inputRef={input => input && input.focus()} // autofocus
                 onChange={onChange}
                 onKeyDown={onKeyDown}
                 value={query}
