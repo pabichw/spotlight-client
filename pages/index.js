@@ -92,7 +92,7 @@ export default function Home({ photos }) {
         </Box>
           <Grid container className={styles.photoGrid} spacing={2}>
             { photos?.map((photo, idx) => 
-              <Grid item key={photo.id} xs={12} sm={6} md={4} >
+              <Grid item key={photo.id} xs={12} sm={6} md={4} data-testid="photo-card">
                 <Card sx={{ minHeight: '280px' }} className={styles.photoCard} onClick={() => toggleGallery(photo)}>
                   <CardCover>
                     <Image

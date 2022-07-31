@@ -1,6 +1,7 @@
 import { render, cleanup, screen } from '@testing-library/react';
 import '@testing-library/jest-dom'
-import Home from '../pages/index.js'
+import Home from '../../pages/index.js'
+import { MOCKS } from '../../utils/mocks'
 
 jest.mock("next/router", () => ({
   useRouter() {
@@ -33,18 +34,15 @@ describe('Main page', () => {
       name: 'Spotlight Wallpapers',
     })
 
-    console.log('heading', heading);
     expect(heading).toBeInTheDocument()
   })
 
-  it('renders list', () => {
-    render(
-      <Home />
+  it('renders list of given photos', async () => {
+    const { findAllByTestId } = render(
+      <Home photos={MOCKS.PHOTOS.slice(0, 3)}/>
     )
 
-    const list = document.querySelector('.photoGrid'); 
-
-    console.log('list', list);
-    expect(list).toBeInTheDocument()
+   const list = await findAllByTestId('photo-card'); 
+   expect(list).toHaveLength(3);
   })
 })
