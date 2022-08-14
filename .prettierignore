@@ -1,0 +1,13 @@
+# NODE
+node_modules
+.env.*
+
+# NEXT
+.next
+out
+
+# OS
+.DS_Store
+
+# VIM
+Session.vim
