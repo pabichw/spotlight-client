@@ -1,7 +1,7 @@
-import { render, cleanup, screen } from '@testing-library/react';
-import '@testing-library/jest-dom'
-import Home from '../../pages/index.js'
-import { MOCKS } from '../../utils/mocks'
+import { render, cleanup, screen } from "@testing-library/react";
+import "@testing-library/jest-dom";
+import Home from "../../pages/index.js";
+import { MOCKS } from "../../utils/mocks";
 
 jest.mock("next/router", () => ({
   useRouter() {
@@ -14,35 +14,40 @@ jest.mock("next/router", () => ({
   },
 }));
 
-describe('Main page', () => {
+describe("Main page", () => {
   const OLD_ENV = process.env;
 
   beforeEach(() => {
-    jest.resetModules() // Most important - it clears the cache
+    jest.resetModules(); // Most important - it clears the cache
     process.env = { ...OLD_ENV }; // Make a copy
   });
 
-
   afterEach(cleanup);
 
-  it('renders header', () => {
-    render(
-      <Home />
-    )
+  it("renders header", () => {
+    render(<Home />);
 
-    const heading = screen.getByRole('heading', {
-      name: 'Spotlight Wallpapers',
-    })
+    const heading = screen.getByRole("heading", {
+      name: "Spotlight Wallpapers",
+    });
 
-    expect(heading).toBeInTheDocument()
-  })
+    expect(heading).toBeInTheDocument();
+  });
 
-  it('renders list of given photos', async () => {
+  it("renders list of given photos", async () => {
     const { findAllByTestId } = render(
-      <Home photos={MOCKS.PHOTOS.slice(0, 3)}/>
-    )
+      <Home photos={MOCKS.PHOTOS.slice(0, 3)} />
+    );
 
-   const list = await findAllByTestId('photo-card'); 
-   expect(list).toHaveLength(3);
-  })
-})
+    const list = await findAllByTestId("photo-card");
+    expect(list).toHaveLength(3);
+  });
+
+  it("render correct pages in pagination", async () => {
+    const { findByTestId } = render(<Home photos={MOCKS.PHOTOS.slice(0, 3)} />);
+
+    const pagination = await findByTestId("pagination");
+    console.log(pagination);
+    expect(pagination).toMatchSnapshot();
+  });
+});
