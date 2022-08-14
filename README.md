@@ -1,3 +1,6 @@
+## Demo
+[Click here to see demo](https://spotlight.pabich.cc)
+
 ## Getting Started
 
 First, run the development server:
