@@ -18,7 +18,7 @@ import Box from "@mui/material/Box";
 import { format, parseISO } from "date-fns";
 import SearchBar from "../components/SearchBar";
 
-const PER_PAGE = 6;
+const PER_PAGE = 12;
 
 const fetchPhotos = async (page, search) => {
   const firstIndex = PER_PAGE * (page - 1);
